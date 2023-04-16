@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework.views import APIView, Request, Response, status
 from users.serializer import UserSerializer
 from users.models import User
-from django.forms.models import model_to_dict
 
 # Create your views here.
 class UserView(APIView):
