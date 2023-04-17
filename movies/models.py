@@ -13,3 +13,4 @@ class Movie(models.Model):
     duration = models.CharField(max_length=10, null=True, default=None)
     rating = models.CharField(max_length=20, choices=Rating_choices.choices, default=Rating_choices.G)
     synopsis = models.TextField(null=True, default=None)
+    added_by = models.EmailField()
