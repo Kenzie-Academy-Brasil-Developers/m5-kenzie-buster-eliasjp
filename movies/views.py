@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination
 class MovieView(APIView, PageNumberPagination): 
     authentication_classes = [JWTAuthentication]
     def get_permissions(self):
-        if self.request.method == "POST":
+        if self.request.method != "GET":
             return [IsAdminUser()]
         return super().get_permissions()
 
@@ -29,6 +29,13 @@ class MovieView(APIView, PageNumberPagination):
         serialized.save(user=request.user)
 
         return Response(serialized.data, status.HTTP_201_CREATED)
+    
+    def delete(self, request: Request):
+        find_movie = Movie.objects.filter(**request.data).first()
+        if not find_movie:
+            return Response({"detail": "Movie not found"}, status.HTTP_404_NOT_FOUND)
+        find_movie.delete()
+        return Response(None, status.HTTP_204_NO_CONTENT)
     
 class MovieByIdView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -47,7 +54,7 @@ class MovieByIdView(APIView):
     def delete(self, request, movie_id):
         find_movie = Movie.objects.filter(id=movie_id).first()
         if not find_movie:
-            return Response("Movie not found.", status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Movie not found"}, status.HTTP_404_NOT_FOUND)
         find_movie.delete()
         return Response(None, status.HTTP_204_NO_CONTENT)
     
