@@ -6,9 +6,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from movies.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
 from users.models import User
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
-class MovieView(APIView): 
+class MovieView(APIView, PageNumberPagination): 
     authentication_classes = [JWTAuthentication]
     def get_permissions(self):
         if self.request.method == "POST":
@@ -16,9 +17,11 @@ class MovieView(APIView):
         return super().get_permissions()
 
     def get(self, request: Request):
-        movies = Movie.objects.all()
-        serialized = MovieSerializer(movies, many=True)
-        return Response(serialized.data)
+        find_movie = Movie.objects.all()
+        result_page = self.paginate_queryset(find_movie, request, view=self)
+        serialized = MovieSerializer(result_page, many=True)
+
+        return self.get_paginated_response(serialized.data)
 
     def post(self, request: Request):
         serialized = MovieSerializer(data=request.data)
